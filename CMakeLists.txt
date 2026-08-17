@@ -6,8 +6,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(AddedDifficulty
-    src/main.cpp
+        src/main.cpp
         src/AnimationModule.cpp
+        src/menus/MainMenu.cpp
+        src/menus/Game.cpp
 )
 
 find_package(raylib REQUIRED)
