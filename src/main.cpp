@@ -1,5 +1,4 @@
 #include "raylib.h"
-#include "AnimationModule.hpp"
 
 #include "menus/Game.hpp"
 #include "menus/MainMenu.hpp"
@@ -11,11 +10,13 @@ int main()
     constexpr int screenWidth = 1000;
     constexpr int screenHeight = 1000;
 
+    SetTraceLogLevel(LOG_ALL);
+
     Menu currentMenu = MAIN_MENU;
 
     InitWindow(screenWidth, screenHeight, "Added Difficulty");
 
-    SetTargetFPS(60);
+    SetTargetFPS(144);
     SetExitKey(KEY_NULL);
 
     while (!WindowShouldClose()) {
@@ -35,6 +36,7 @@ int main()
         EndDrawing();
     }
 
+    Game::end();
     CloseWindow();
 
     return 0;

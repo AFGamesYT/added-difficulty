@@ -4,7 +4,7 @@ namespace MainMenu {
     void draw(Vector2 resolution) {
         ClearBackground(RAYWHITE);
 
-        DrawText("Main Menu\nPress Enter for red square", 100, 100, 50, BLACK);
+        DrawText("Main Menu\nPress Enter to start the game", 100, 100, 50, BLACK);
     }
 
     void handle(Menu &menu) {

@@ -10,6 +10,7 @@ add_executable(AddedDifficulty
         src/AnimationModule.cpp
         src/menus/MainMenu.cpp
         src/menus/Game.cpp
+        src/Enemy.cpp
 )
 
 find_package(raylib REQUIRED)

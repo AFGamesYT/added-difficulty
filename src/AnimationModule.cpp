@@ -116,14 +116,14 @@ Rectangle AnimHandler::spriteAnim(int id) {
     if (!anim.isBasic) {
         double t = (GetTime() - anim.startTime) / anim.length;
 
-        int i = t*anim.frames;
         if (t >= 1) {
             if (anim.loop) {
                 t = std::fmod(t, 1);
             } else {
-                i = anim.frames - 1;
+                t = 1.0;
             }
         }
+        int i = t*anim.frames;
 
         anim.timePassed = GetTime() - anim.startTime;
 
