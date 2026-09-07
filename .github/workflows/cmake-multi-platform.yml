@@ -1,4 +1,3 @@
-```yaml
 name: Build Game
 
 on:
@@ -71,4 +70,3 @@ jobs:
         with:
           name: AddedDifficulty-${{ matrix.name }}
           path: AddedDifficulty-${{ matrix.name }}.zip
-```
