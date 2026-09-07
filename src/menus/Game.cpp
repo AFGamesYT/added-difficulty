@@ -1,13 +1,16 @@
 #include "Game.hpp"
 #include "../AnimationModule.hpp"
+#include "../Enemy.hpp"
 
 namespace Game {
     static AnimHandler animHandler;
 
     static Texture2D player_texture_left;
     static Texture2D player_texture_right;
+    static Texture2D badger;
+    static FollowingEnemy testEnemy{1000, 1000, 50};
 
-    static bool loadedTextures = false;
+    static bool firstLoad = true;
 
     void draw(Vector2 resolution) {
         static Vector2 pos{};
@@ -22,11 +25,14 @@ namespace Game {
 
         const float playerSize = resolution.x * 0.185;
 
-        if (!loadedTextures) {
+        if (firstLoad) {
             player_texture_left = LoadTexture("assets/player_sprites_left.png");
             player_texture_right = LoadTexture("assets/player_sprites_right.png");
+            badger = LoadTexture("assets/badger.png");
 
-            loadedTextures = true;
+            testEnemy.speed = 4.0f;
+
+            firstLoad = false;
         }
 
         ClearBackground(Color{12, 15, 33, 255});
@@ -41,6 +47,15 @@ namespace Game {
             Vector2{0, 0},
             0.0f,
             WHITE);
+
+
+        DrawTextureEx(
+            badger,
+            testEnemy.GetNextPosition(Vector2{pos.x-playerSize/2, pos.y-playerSize/2}, true),
+            0.0f,
+            0.25f,
+            WHITE
+        );
     }
 
     void handle(Menu &menu) {
@@ -53,5 +68,6 @@ namespace Game {
     void end() {
         UnloadTexture(player_texture_left);
         UnloadTexture(player_texture_right);
+        UnloadTexture(badger);
     }
 }

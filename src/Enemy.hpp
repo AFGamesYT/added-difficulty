@@ -1,14 +1,23 @@
 #pragma once
 #include <raylib.h>
 
-class Enemy {
+class BaseEnemy {
+protected:
     Rectangle hitbox{};
-    int x{}, y{}, radius{};
+    float x{}, y{};
+    int radius{};
     bool circleHitbox = false;
     double timeCreated;
 
 public:
-    explicit Enemy(Rectangle hitbox);
-    Enemy(int x, int y, int radius);
+    explicit BaseEnemy(Rectangle hitbox);
+    BaseEnemy(float x, float y, int radius);
     bool isCollidingRec(Rectangle rectangle);
+};
+
+class FollowingEnemy: public BaseEnemy {
+public:
+    float speed = 1.0;
+    FollowingEnemy(float x, float y, int radius);
+    Vector2 GetNextPosition(Vector2 target, bool set);
 };
