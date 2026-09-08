@@ -1,5 +1,6 @@
 #include "Enemy.hpp"
 #include <cmath>
+#include <algorithm>
 
 BaseEnemy::BaseEnemy(Rectangle hitbox)
     : hitbox(hitbox)

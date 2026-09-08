@@ -1,0 +1,72 @@
+name: Build Game
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Linux
+          - os: windows-latest
+            name: Windows
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # raylib needs these development libraries on Linux
+      - name: Install Linux dependencies
+        if: matrix.name == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-dev \
+            libxcursor-dev \
+            libxinerama-dev \
+            libxrandr-dev \
+            libxi-dev \
+            libxext-dev \
+            libxfixes-dev \
+            libxrender-dev \
+            libgl1-mesa-dev \
+            libwayland-dev \
+            libxkbcommon-dev
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -S .
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Package game
+        shell: bash
+        run: |
+          mkdir -p package
+
+          if [ "${{ matrix.name }}" = "Windows" ]; then
+            cp build/Release/AddedDifficulty.exe package/
+          else
+            cp build/AddedDifficulty package/
+          fi
+
+          cp -r assets package/assets
+
+      - name: Create ZIP
+        shell: bash
+        run: |
+          cd package
+          7z a "../AddedDifficulty-${{ matrix.name }}.zip" .
+
+      - name: Upload game
+        uses: actions/upload-artifact@v4
+        with:
+          name: AddedDifficulty-${{ matrix.name }}
+          path: AddedDifficulty-${{ matrix.name }}.zip
