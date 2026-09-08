@@ -1,6 +1,7 @@
 #include "Game.hpp"
 #include "../AnimationModule.hpp"
 #include "../Enemy.hpp"
+#include "../definitions.hpp"
 
 namespace Game {
     static AnimHandler animHandler;
@@ -8,7 +9,7 @@ namespace Game {
     static Texture2D player_texture_left;
     static Texture2D player_texture_right;
     static Texture2D badger;
-    static FollowingEnemy testEnemy{1000, 1000, 2};
+    static FollowingEnemy testEnemy{CircleParams{1000, 1000, 2}};
 
     static bool firstLoad = true;
 

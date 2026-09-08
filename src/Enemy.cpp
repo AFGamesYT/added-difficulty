@@ -8,8 +8,8 @@ BaseEnemy::BaseEnemy(Rectangle hitbox)
     timeCreated = GetTime();
 }
 
-BaseEnemy::BaseEnemy(float x, float y, int radius)
-    : x(x), y(y), radius(radius)
+BaseEnemy::BaseEnemy(CircleParams params)
+    : x(params.x), y(params.y), radius(params.radius)
 {
     timeCreated = GetTime();
     circleHitbox = true;
@@ -28,7 +28,7 @@ bool BaseEnemy::isCollidingRec(Rectangle rectangle) {
     return CheckCollisionRecs(hitbox, rectangle);
 }
 
-FollowingEnemy::FollowingEnemy(float x, float y, int radius) : BaseEnemy(x, y, radius) {}
+FollowingEnemy::FollowingEnemy(CircleParams params) : BaseEnemy(params) {}
 
 Vector2 FollowingEnemy::GetNextPosition(Vector2 target, bool set, float offsetX, float offsetY) {
     const float dx = target.x - x;
