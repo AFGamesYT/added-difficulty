@@ -8,7 +8,7 @@ namespace Game {
     static Texture2D player_texture_left;
     static Texture2D player_texture_right;
     static Texture2D badger;
-    static FollowingEnemy testEnemy{1000, 1000, 50};
+    static FollowingEnemy testEnemy{1000, 1000, 2};
 
     static bool firstLoad = true;
 
@@ -31,6 +31,7 @@ namespace Game {
             badger = LoadTexture("assets/badger.png");
 
             testEnemy.speed = 4.0f;
+            testEnemy.radius = resolution.x*0.1/2;
 
             firstLoad = false;
         }
@@ -49,13 +50,16 @@ namespace Game {
             WHITE);
 
 
-        DrawTextureEx(
-            badger,
-            testEnemy.GetNextPosition(Vector2{pos.x-playerSize/2, pos.y-playerSize/2}, true),
-            0.0f,
-            0.25f,
-            WHITE
-        );
+        // DrawTextureEx(
+        //     badger,
+        //     testEnemy.GetNextPosition(Vector2{pos.x, pos.y}, true, testEnemy.radius, testEnemy.radius),
+        //     0.0f,
+        //     0.5,
+        //     WHITE
+        // );
+
+        testEnemy.DrawNextPos(badger, resolution.x*0.20/500, Vector2{pos.x, pos.y});
+        testEnemy.DrawHitbox();
     }
 
     void handle(Menu &menu) {
