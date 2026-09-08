@@ -25,3 +25,6 @@ public:
     Vector2 GetNextPosition(Vector2 target, bool set, float offsetX = 0, float offsetY = 0);
     void DrawNextPos(const Texture2D &texture, float scale, Vector2 target);
 };
+
+void DrawRectHitbox(Rectangle rect, Color color = RED, int thickness = 1);
+void DrawCircleHitbox(CircleParams circle, Color color = RED, int thickness = 1);

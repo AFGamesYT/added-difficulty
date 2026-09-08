@@ -21,7 +21,7 @@ bool BaseEnemy::isCollidingRec(Rectangle rectangle) {
         const double closestY = std::max(rectangle.y, std::min((float)y, rectangle.y + rectangle.height));
 
         const double dx = x - closestX;
-        const double dy = x - closestY;
+        const double dy = y - closestY;
 
         return dx * dx + dy * dy <= radius * radius;
     }
@@ -58,7 +58,12 @@ Vector2 FollowingEnemy::GetNextPosition(Vector2 target, bool set, float offsetX,
 
 void BaseEnemy::DrawHitbox(Color color, int thickness) const {
     if (circleHitbox) {
-        DrawRing(Vector2{x, y}, (float)(radius-thickness), (float)radius, 0, 360, 0, color);
+        DrawRing(Vector2{x, y}, radius-thickness, radius, 0, 360, 0, color);
+    } else {
+        DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y}, thickness, color);
+        DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x, hitbox.y+hitbox.height}, thickness, color);
+        DrawLineEx(Vector2{hitbox.x, hitbox.y+hitbox.height}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
+        DrawLineEx(Vector2{hitbox.x+hitbox.width, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
     }
 }
 
@@ -89,4 +94,15 @@ void FollowingEnemy::DrawNextPos(const Texture2D &texture, float scale, Vector2 
             WHITE
         );
     }
+}
+
+void DrawRectHitbox(Rectangle hitbox, Color color, int thickness) {
+    DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y}, thickness, color);
+    DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x, hitbox.y+hitbox.height}, thickness, color);
+    DrawLineEx(Vector2{hitbox.x, hitbox.y+hitbox.height}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
+    DrawLineEx(Vector2{hitbox.x+hitbox.width, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
+}
+
+void DrawCircleHitbox(CircleParams circle, Color color, int thickness) {
+    DrawRing(Vector2{circle.x, circle.y}, circle.radius-thickness, circle.radius, 0, 360, 0, color);
 }

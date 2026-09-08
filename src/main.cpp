@@ -31,6 +31,8 @@ int main()
                 Game::draw(Vector2{screenWidth, screenHeight});
                 Game::handle(currentMenu);
                 break;
+            case AFTER_GAME:
+                Game::afterGame(currentMenu);
         }
 
         EndDrawing();

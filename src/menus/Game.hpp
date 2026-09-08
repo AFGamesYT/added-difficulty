@@ -10,5 +10,7 @@ namespace Game {
 
     void handle(Menu &menu);
 
+    void afterGame(Menu &menu);
+
     void end();
 }
