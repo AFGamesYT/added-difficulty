@@ -86,8 +86,20 @@ namespace Game {
     }
 
     void afterGame(Menu &menu) {
-        ClearBackground(DEATH_BG);
-        DrawText("You died D:\nEnter to start again\nEsc to go to menu", 100, 100, 50, WHITE);
+        animHandler.createAnim(2, 0, 1, 2, 0);
+        double bg_progress = animHandler.quadraticOut(2);
+        ClearBackground(Color{
+             (unsigned char)(GAME_BG.r+(DEATH_BG.r-GAME_BG.r)*bg_progress),
+            (unsigned char)(GAME_BG.b+(DEATH_BG.b-GAME_BG.b)*bg_progress),
+            (unsigned char)(GAME_BG.g+(DEATH_BG.g-GAME_BG.g)*bg_progress),
+            255
+        });
+        DrawText("You died D:\nEnter to start again\nEsc to go to menu", 100, 100, 50, Color{
+             (unsigned char)(255*bg_progress),
+            (unsigned char)(255*bg_progress),
+            (unsigned char)(255*bg_progress),
+            255
+        });
         if (IsKeyDown(KEY_ESCAPE)) {
             menu = MAIN_MENU;
         } else if (IsKeyPressed(KEY_ENTER)) {
