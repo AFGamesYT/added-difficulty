@@ -2,103 +2,145 @@
 #include <cmath>
 #include <algorithm>
 
-BaseEnemy::BaseEnemy(Rectangle hitbox)
-    : hitbox(hitbox)
-{
+BaseEnemy::BaseEnemy(Rectangle hitbox) {
+    rectHitboxes.push_back(hitbox);
+
     timeCreated = GetTime();
+    // we leave the hitbox type default
 }
 
-BaseEnemy::BaseEnemy(CircleParams params)
-    : x(params.x), y(params.y), radius(params.radius)
-{
+BaseEnemy::BaseEnemy(CircleParams hitbox) {
+    circleHitboxes.push_back(hitbox);
+
     timeCreated = GetTime();
-    circleHitbox = true;
+    hitboxType = Circle;
+}
+
+BaseEnemy::BaseEnemy(const std::vector<Rectangle>& hitboxes) {
+    for (auto hitbox: hitboxes) {
+        rectHitboxes.push_back(hitbox);
+    }
+
+    timeCreated = GetTime();
+    hitboxType = Rect;
+}
+
+BaseEnemy::BaseEnemy(const std::vector<CircleParams>& hitboxes) {
+    for (auto hitbox: hitboxes) {
+        circleHitboxes.push_back(hitbox);
+    }
+
+    timeCreated = GetTime();
+    hitboxType = Circle;
 }
 
 bool BaseEnemy::isCollidingRec(Rectangle rectangle) {
-    if (circleHitbox) {
-        const double closestX = std::max(rectangle.x, std::min((float)x, rectangle.x + rectangle.width));
-        const double closestY = std::max(rectangle.y, std::min((float)y, rectangle.y + rectangle.height));
+    if (hitboxType == Circle) {
+        for (auto circle : circleHitboxes) {
+            const double closestX = std::max(rectangle.x, std::min((float)circle.x, rectangle.x + rectangle.width));
+            const double closestY = std::max(rectangle.y, std::min((float)circle.y, rectangle.y + rectangle.height));
 
-        const double dx = x - closestX;
-        const double dy = y - closestY;
+            const double dx = circle.x - closestX;
+            const double dy = circle.y - closestY;
 
-        return dx * dx + dy * dy <= radius * radius;
+            const bool touching = dx * dx + dy * dy <= circle.radius * circle.radius;
+
+            if (!touching) continue;
+            return true;
+        }
+        return false;
     }
-    return CheckCollisionRecs(hitbox, rectangle);
+
+    for (auto hitbox: rectHitboxes) {
+        const bool touching = CheckCollisionRecs(hitbox, rectangle);
+        if (!touching) continue;
+        return true;
+    }
+
+    return false;
 }
 
 void BaseEnemy::DrawHitbox(Color color, int thickness) const {
-    if (circleHitbox) {
-        DrawRing(Vector2{x, y}, radius-thickness, radius, 0, 360, 0, color);
+    if (hitboxType == Circle) {
+        for (auto circle: circleHitboxes) {
+            DrawRing(Vector2{circle.x, circle.y}, circle.radius-thickness, circle.radius, 0, 360, 0, color);
+        }
     } else {
-        DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y}, thickness, color);
-        DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x, hitbox.y+hitbox.height}, thickness, color);
-        DrawLineEx(Vector2{hitbox.x, hitbox.y+hitbox.height}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
-        DrawLineEx(Vector2{hitbox.x+hitbox.width, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
+        for (auto hitbox: rectHitboxes) {
+            DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y}, thickness, color);
+            DrawLineEx(Vector2{hitbox.x, hitbox.y}, Vector2{hitbox.x, hitbox.y+hitbox.height}, thickness, color);
+            DrawLineEx(Vector2{hitbox.x, hitbox.y+hitbox.height}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
+            DrawLineEx(Vector2{hitbox.x+hitbox.width, hitbox.y}, Vector2{hitbox.x + hitbox.width, hitbox.y + hitbox.height}, thickness, color);
+        }
     }
 }
 
 void BaseEnemy::Draw(const Texture2D &texture, float scale) const {
-    if (circleHitbox) {
-        const float newX = x-2.0*radius-0.5*scale*texture.width;
-        const float newY = y-2.0*radius-0.5*scale*texture.width;
-        DrawTextureEx(
-            texture,
-            Vector2{newX, newY},
-            0,
-            scale,
-            WHITE
-        );
+    if (hitboxType == Circle) {
+        for (auto circle: circleHitboxes) {
+            const float newX = circle.x-2.0*circle.radius-0.5*scale*texture.width;
+            const float newY = circle.y-2.0*circle.radius-0.5*scale*texture.width;
+            DrawTextureEx(
+                texture,
+                Vector2{newX, newY},
+                0,
+                scale,
+                WHITE
+            );
+        }
     }
 }
 
 
-void FollowingEnemy::DrawNextPos(const Texture2D &texture, float scale) {
-    GetNextPosition(true);
-    if (circleHitbox) {
-        const float newX = x-2.0*radius;
-        const float newY = y-2.0*radius;
-        DrawTextureEx(
-            texture,
-            Vector2{newX, newY},
-            0,
-            scale,
-            WHITE
-        );
+void FollowingEnemy::DrawNextPos() {
+    if (hitboxType == Circle) {
+        for (auto &circle: circleHitboxes) {
+            GetNextPosition(true, circle);
+            const float newX = circle.x-2.0*circle.radius;
+            const float newY = circle.y-2.0*circle.radius;
+            DrawTextureEx(
+                texture,
+                Vector2{newX, newY},
+                0,
+                textureScale,
+                WHITE
+            );
+        }
     }
 }
 
-FollowingEnemy::FollowingEnemy(CircleParams params) : BaseEnemy(params) {}
+FollowingEnemy::FollowingEnemy(CircleParams params, Texture2D &texture) : BaseEnemy(params), texture(texture) {}
 
-Vector2 FollowingEnemy::GetNextPosition(bool set, float offsetX, float offsetY) {
-    const float dx = target.x - x;
-    const float dy = target.y - y;
+FollowingEnemy::FollowingEnemy(std::vector<CircleParams> params, Texture2D &texture) : BaseEnemy(params), texture(texture) {}
+
+Vector2 FollowingEnemy::GetNextPosition(bool set, CircleParams &params) {
+    const float dx = target.x - params.x;
+    const float dy = target.y - params.y;
 
     const float dist = std::sqrt(dx * dx + dy * dy);
 
     if (dist <= speed) {
         if (set) {
-            x = target.x;
-            y = target.y;
+            params.x = target.x;
+            params.y = target.y;
         }
 
         return target;
     }
 
-    const float nextX = x + dx / dist * speed;
-    const float nextY = y + dy / dist * speed;
+    const float nextX = params.x + dx / dist * speed;
+    const float nextY = params.y + dy / dist * speed;
 
     if (set) {
-        x = nextX;
-        y = nextY;
+        params.x = nextX;
+        params.y = nextY;
     }
 
-    return Vector2{nextX-offsetX, nextY-offsetY};
+    return Vector2{nextX, nextY};
 }
 
 void FollowingEnemy::Update() {
-    GetNextPosition(true);
+    DrawNextPos();
 }
 
 void DrawRectHitbox(Rectangle hitbox, Color color, int thickness) {

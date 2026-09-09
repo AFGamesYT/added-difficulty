@@ -4,7 +4,6 @@
 #include "../definitions.hpp"
 
 #include <vector>
-#include <typeinfo>
 
 namespace Game {
     // static variables
@@ -17,7 +16,18 @@ namespace Game {
 
     static std::vector<BaseEnemy*> enemies;
 
-    static FollowingEnemy testEnemy{CircleParams{1000, 1000, 2}};
+    // enemy with multiple circles
+
+    static FollowingEnemy testEnemy{std::vector{
+        CircleParams{1000, 1000, 2},
+        CircleParams{0, 0, 2},
+        CircleParams{1000, 0, 2}
+
+    }, badger};
+
+    // enemy with one circle
+
+    // static FollowingEnemy testEnemy{CircleParams{1000, 1000, 2}, badger};
 
     static Rectangle playerRect;
 
@@ -44,7 +54,12 @@ namespace Game {
             badger = LoadTexture("assets/badger.png");
 
             testEnemy.speed = 4.0f;
-            testEnemy.radius = resolution.x*0.1/2;
+            for (auto &circle: testEnemy.circleHitboxes) {
+                circle.radius = resolution.x*0.1/2;
+            }
+            testEnemy.circleHitboxes[1].radius = resolution.x*0.1/2;
+            testEnemy.textureScale = resolution.x*0.20/500;
+
             enemies.push_back(&testEnemy);
 
             playerSize = resolution.x * 0.185;
@@ -66,11 +81,9 @@ namespace Game {
             WHITE);
 
 
-        testEnemy.DrawNextPos(badger, resolution.x*0.20/500);
-
-        // draw hitbox for all enemies
         for (const auto enemy: enemies) {
-            enemy->DrawHitbox();
+            enemy->Update();
+            enemy->DrawHitbox();  // draw hitbox for all enemies
         }
     }
 
@@ -118,8 +131,8 @@ namespace Game {
             menu = MAIN_MENU;
         } else if (IsKeyPressed(KEY_ENTER)) {
             animHandler.stopAnim(2);
-            // here we need a restart function for future additions,
-            // right now its perfectly fine like this
+            // here we are going to need a restart function for future additions,
+            // right now it works good enough like this
             menu = GAME;
         }
     }

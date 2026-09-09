@@ -6,6 +6,11 @@ enum Menu {
     AFTER_GAME
 };
 
+enum HitboxType {
+    Circle,
+    Rect,
+};
+
 struct CircleParams {
     float x;
     float y;
