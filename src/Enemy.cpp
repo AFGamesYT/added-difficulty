@@ -28,34 +28,6 @@ bool BaseEnemy::isCollidingRec(Rectangle rectangle) {
     return CheckCollisionRecs(hitbox, rectangle);
 }
 
-FollowingEnemy::FollowingEnemy(CircleParams params) : BaseEnemy(params) {}
-
-Vector2 FollowingEnemy::GetNextPosition(Vector2 target, bool set, float offsetX, float offsetY) {
-    const float dx = target.x - x;
-    const float dy = target.y - y;
-
-    const float dist = std::sqrt(dx * dx + dy * dy);
-
-    if (dist <= speed) {
-        if (set) {
-            x = target.x;
-            y = target.y;
-        }
-
-        return target;
-    }
-
-    const float nextX = x + dx / dist * speed;
-    const float nextY = y + dy / dist * speed;
-
-    if (set) {
-        x = nextX;
-        y = nextY;
-    }
-
-    return Vector2{nextX-offsetX, nextY-offsetY};
-}
-
 void BaseEnemy::DrawHitbox(Color color, int thickness) const {
     if (circleHitbox) {
         DrawRing(Vector2{x, y}, radius-thickness, radius, 0, 360, 0, color);
@@ -81,8 +53,9 @@ void BaseEnemy::Draw(const Texture2D &texture, float scale) const {
     }
 }
 
-void FollowingEnemy::DrawNextPos(const Texture2D &texture, float scale, Vector2 target) {
-    GetNextPosition(target, true);
+
+void FollowingEnemy::DrawNextPos(const Texture2D &texture, float scale) {
+    GetNextPosition(true);
     if (circleHitbox) {
         const float newX = x-2.0*radius;
         const float newY = y-2.0*radius;
@@ -94,6 +67,38 @@ void FollowingEnemy::DrawNextPos(const Texture2D &texture, float scale, Vector2 
             WHITE
         );
     }
+}
+
+FollowingEnemy::FollowingEnemy(CircleParams params) : BaseEnemy(params) {}
+
+Vector2 FollowingEnemy::GetNextPosition(bool set, float offsetX, float offsetY) {
+    const float dx = target.x - x;
+    const float dy = target.y - y;
+
+    const float dist = std::sqrt(dx * dx + dy * dy);
+
+    if (dist <= speed) {
+        if (set) {
+            x = target.x;
+            y = target.y;
+        }
+
+        return target;
+    }
+
+    const float nextX = x + dx / dist * speed;
+    const float nextY = y + dy / dist * speed;
+
+    if (set) {
+        x = nextX;
+        y = nextY;
+    }
+
+    return Vector2{nextX-offsetX, nextY-offsetY};
+}
+
+void FollowingEnemy::Update() {
+    GetNextPosition(true);
 }
 
 void DrawRectHitbox(Rectangle hitbox, Color color, int thickness) {

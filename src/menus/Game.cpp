@@ -3,20 +3,26 @@
 #include "../Enemy.hpp"
 #include "../definitions.hpp"
 
+#include <vector>
+#include <typeinfo>
+
 namespace Game {
     // static variables
     static AnimHandler animHandler;
 
+    // textures
     static Texture2D player_texture_left;
     static Texture2D player_texture_right;
     static Texture2D badger;
+
+    static std::vector<BaseEnemy*> enemies;
 
     static FollowingEnemy testEnemy{CircleParams{1000, 1000, 2}};
 
     static Rectangle playerRect;
 
     static bool firstLoad = true;
-    static bool ggs = false;
+    static double gameOverTime;
 
     static float playerSize;
 
@@ -30,7 +36,7 @@ namespace Game {
         }
 
         pos = GetMousePosition();
-
+        testEnemy.target = pos;
 
         if (firstLoad) {
             player_texture_left = LoadTexture("assets/player_sprites_left.png");
@@ -39,13 +45,14 @@ namespace Game {
 
             testEnemy.speed = 4.0f;
             testEnemy.radius = resolution.x*0.1/2;
+            enemies.push_back(&testEnemy);
 
             playerSize = resolution.x * 0.185;
 
             firstLoad = false;
         }
 
-        ClearBackground(!ggs ? GAME_BG : DEATH_BG);
+        ClearBackground(GAME_BG);
 
         animHandler.createSpriteAnim(1, 2, 500, 500, 0.7, true);
         playerRect = animHandler.spriteAnim(1);
@@ -59,8 +66,12 @@ namespace Game {
             WHITE);
 
 
-        testEnemy.DrawNextPos(badger, resolution.x*0.20/500, Vector2{pos.x, pos.y});
-        testEnemy.DrawHitbox();
+        testEnemy.DrawNextPos(badger, resolution.x*0.20/500);
+
+        // draw hitbox for all enemies
+        for (const auto enemy: enemies) {
+            enemy->DrawHitbox();
+        }
     }
 
     void handle(Menu &menu) {
@@ -72,21 +83,24 @@ namespace Game {
         const auto playerHitbox = Rectangle{pos.x-playerSize/4, pos.y, playerSize/2, playerSize/4};
         DrawRectHitbox(playerHitbox);
 
-        if (testEnemy.isCollidingRec(playerHitbox)) {
+        for (const auto enemy: enemies) {
+            if (enemy->isCollidingRec(playerHitbox)) {
+                menu = AFTER_GAME;
+            }
+        }
+    }
+
+    void afterGame(Menu &menu) {
             /* animation:
+             * wait a bit
              * background fades to red
              * as that is happening, enemies slow down
              * player's cursor appears, but doesnt control the player
              * menu: " run finished - again / menu "
              */
 
-            ggs = true;
-            menu = AFTER_GAME;
-        }
-    }
+        animHandler.createAnim(2, 0, 1, 5, 0);
 
-    void afterGame(Menu &menu) {
-        animHandler.createAnim(2, 0, 1, 2, 0);
         double bg_progress = animHandler.quadraticOut(2);
         ClearBackground(Color{
              (unsigned char)(GAME_BG.r+(DEATH_BG.r-GAME_BG.r)*bg_progress),
@@ -103,7 +117,7 @@ namespace Game {
         if (IsKeyDown(KEY_ESCAPE)) {
             menu = MAIN_MENU;
         } else if (IsKeyPressed(KEY_ENTER)) {
-            ggs = false;
+            animHandler.stopAnim(2);
             // here we need a restart function for future additions,
             // right now its perfectly fine like this
             menu = GAME;
