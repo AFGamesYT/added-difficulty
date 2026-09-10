@@ -16,7 +16,7 @@ namespace Game {
 
     static std::vector<BaseEnemy*> enemies;
 
-    // enemy with multiple circles
+    // enemy with multiple circle hitboxes
 
     static FollowingEnemy testEnemy{std::vector{
         CircleParams{1000, 1000, 2},
@@ -35,11 +35,11 @@ namespace Game {
     static double gameOverTime;
 
     static float playerSize;
+    static Vector2 finalPlayerPos;
+    static bool looking_left = false;
 
     void draw(Vector2 resolution) {
         static Vector2 pos{};
-
-        static bool looking_left = false;
 
         if (pos.x != GetMousePosition().x) {
             looking_left = pos.x > GetMousePosition().x;
@@ -82,7 +82,7 @@ namespace Game {
 
 
         for (const auto enemy: enemies) {
-            enemy->Update();
+            enemy->Update(1);
             enemy->DrawHitbox();  // draw hitbox for all enemies
         }
     }
@@ -98,7 +98,10 @@ namespace Game {
 
         for (const auto enemy: enemies) {
             if (enemy->isCollidingRec(playerHitbox)) {
+                gameOverTime = GetTime();
                 menu = AFTER_GAME;
+                finalPlayerPos = GetMousePosition();
+                ShowCursor();
             }
         }
     }
@@ -112,21 +115,42 @@ namespace Game {
              * menu: " run finished - again / menu "
              */
 
-        animHandler.createAnim(2, 0, 1, 5, 0);
+        animHandler.createAnim(3, 1, 0, 1, 0);
+        const double slow_progress = animHandler.quadraticOut(3);
+        for (const auto enemy: enemies) {
+            enemy->Update(slow_progress);
+            enemy->DrawHitbox();
+        }
 
-        double bg_progress = animHandler.quadraticOut(2);
-        ClearBackground(Color{
-             (unsigned char)(GAME_BG.r+(DEATH_BG.r-GAME_BG.r)*bg_progress),
-            (unsigned char)(GAME_BG.b+(DEATH_BG.b-GAME_BG.b)*bg_progress),
-            (unsigned char)(GAME_BG.g+(DEATH_BG.g-GAME_BG.g)*bg_progress),
-            255
+        DrawTexturePro(
+            looking_left ? player_texture_left : player_texture_right,
+            playerRect,
+            Rectangle{finalPlayerPos.x-playerSize/4, finalPlayerPos.y-playerSize/4, playerSize/2, playerSize/2},
+            Vector2{0, 0},
+            0.0f,
+            WHITE);
+
+        if (GetTime() - gameOverTime < 1.2) {
+            ClearBackground(GAME_BG);
+            return;
+        }
+
+        animHandler.createAnim(2, 0, 1, 3, 0);
+
+        const double bg_progress = animHandler.linear(2);
+        DrawRectangle(0, 0, 10000, 10000, Color{
+            DEATH_BG.r,
+            DEATH_BG.g,
+            DEATH_BG.b,
+            (unsigned char)(255*bg_progress),
         });
         DrawText("You died D:\nEnter to start again\nEsc to go to menu", 100, 100, 50, Color{
-             (unsigned char)(255*bg_progress),
+            WHITE.r,
+            WHITE.g,
+            WHITE.b,
             (unsigned char)(255*bg_progress),
-            (unsigned char)(255*bg_progress),
-            255
         });
+
         if (IsKeyDown(KEY_ESCAPE)) {
             menu = MAIN_MENU;
         } else if (IsKeyPressed(KEY_ENTER)) {

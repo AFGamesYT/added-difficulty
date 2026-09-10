@@ -92,10 +92,10 @@ void BaseEnemy::Draw(const Texture2D &texture, float scale) const {
 }
 
 
-void FollowingEnemy::DrawNextPos() {
+void FollowingEnemy::DrawNextPos(double timeScale) {
     if (hitboxType == Circle) {
         for (auto &circle: circleHitboxes) {
-            GetNextPosition(true, circle);
+            GetNextPosition(true, circle, timeScale);
             const float newX = circle.x-2.0*circle.radius;
             const float newY = circle.y-2.0*circle.radius;
             DrawTextureEx(
@@ -113,7 +113,7 @@ FollowingEnemy::FollowingEnemy(CircleParams params, Texture2D &texture) : BaseEn
 
 FollowingEnemy::FollowingEnemy(std::vector<CircleParams> params, Texture2D &texture) : BaseEnemy(params), texture(texture) {}
 
-Vector2 FollowingEnemy::GetNextPosition(bool set, CircleParams &params) {
+Vector2 FollowingEnemy::GetNextPosition(bool set, CircleParams &params, double timeScale) {
     const float dx = target.x - params.x;
     const float dy = target.y - params.y;
 
@@ -128,8 +128,8 @@ Vector2 FollowingEnemy::GetNextPosition(bool set, CircleParams &params) {
         return target;
     }
 
-    const float nextX = params.x + dx / dist * speed;
-    const float nextY = params.y + dy / dist * speed;
+    const float nextX = params.x + dx / dist * speed * timeScale;
+    const float nextY = params.y + dy / dist * speed * timeScale;
 
     if (set) {
         params.x = nextX;
@@ -139,8 +139,8 @@ Vector2 FollowingEnemy::GetNextPosition(bool set, CircleParams &params) {
     return Vector2{nextX, nextY};
 }
 
-void FollowingEnemy::Update() {
-    DrawNextPos();
+void FollowingEnemy::Update(double timeScale) {
+    DrawNextPos(timeScale);
 }
 
 void DrawRectHitbox(Rectangle hitbox, Color color, int thickness) {

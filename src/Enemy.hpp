@@ -24,7 +24,7 @@ public:
     void DrawHitbox(Color color = RED, int thickness = 1) const;
     void Draw(const Texture2D &texture, float scale) const;
 
-    virtual void Update() = 0;
+    virtual void Update(double timeScale) = 0;
 };
 
 class FollowingEnemy: public BaseEnemy {
@@ -37,10 +37,10 @@ public:
     explicit FollowingEnemy(CircleParams params, Texture2D &texture);
     explicit FollowingEnemy(std::vector<CircleParams> params, Texture2D &texture);
 
-    Vector2 GetNextPosition(bool set, CircleParams &params);
-    void DrawNextPos();
+    Vector2 GetNextPosition(bool set, CircleParams &params, double timeScale);
+    void DrawNextPos(double timeScale);
 
-    void Update() override;
+    void Update(double timeScale) override;
 };
 
 class SwitchVerticalLines: public BaseEnemy {
