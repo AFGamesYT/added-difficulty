@@ -6,11 +6,11 @@
 #include "../Enemy.hpp"
 
 namespace Game {
-    void draw(Vector2 resolution);
+    void draw();
 
     void handle(Menu &menu);
 
-    void afterGame(Menu &menu, Vector2 resolution);
+    void afterGame(Menu &menu);
 
     void end();
 }

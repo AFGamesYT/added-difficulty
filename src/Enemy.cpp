@@ -51,7 +51,7 @@ bool BaseEnemy::isCollidingRec(Rectangle rectangle) {
         return false;
     }
 
-    for (auto hitbox: rectHitboxes) {
+    for (const auto &hitbox: rectHitboxes) {
         const bool touching = CheckCollisionRecs(hitbox, rectangle);
         if (!touching) continue;
         return true;
@@ -103,7 +103,7 @@ void FollowingEnemy::DrawNextPos(double timeScale) {
                 Vector2{newX, newY},
                 0,
                 textureScale,
-                WHITE
+                disabled ? Color{255, 255, 255, 70} : WHITE
             );
         }
     }
@@ -144,10 +144,60 @@ void FollowingEnemy::Update(double timeScale) {
 }
 
 
-SwitchVerticalLines::SwitchVerticalLines(const std::vector<Rectangle> &hitboxes) : BaseEnemy(hitboxes), timeCreated(GetTime()) {}
+SwitchVerticalLines::SwitchVerticalLines(const std::vector<Rectangle> &hitboxes) : BaseEnemy(hitboxes), timeCreated(GetTime()) {
+    disabled = true;
+}
 
 void SwitchVerticalLines::Update(double timeScale) {
+    if (GetTime()-timeSwitched > switchTime*(1/timeScale)) {
+        disabled = false;
+        timeSwitched = GetTime();
+    } else if (switchTime*(1/timeScale)-(GetTime()-timeSwitched) < nothingTime*(1/timeScale) && !disabled) {
+        disabled = true;
 
+        std::vector<Rectangle> newHitboxes;
+        for (const auto hitbox: rectHitboxes) {
+            if (rectHitboxes[0].x == 0) { // basically if this has been switched or not
+                newHitboxes.push_back(Rectangle{
+                    hitbox.x+hitbox.width+1,
+                    0,
+                    hitbox.width,
+                    hitbox.height
+                });
+            } else {
+                newHitboxes.push_back(Rectangle{
+                    hitbox.x-hitbox.width-1,
+                    0,
+                    hitbox.width,
+                    hitbox.height
+                });
+            }
+        }
+        rectHitboxes = newHitboxes;
+    }
+
+    Draw(disabled ? Color{255, 0, 0, 70} : RED);
+}
+
+std::vector<Rectangle> generateVerticalLinesHitboxes(int lines) {
+    std::vector<Rectangle> hitboxes;
+    for (int i = 0; i<lines; i++) {
+        if (i % 2 == 0) {
+            hitboxes.push_back({
+            (float)i*resolution.x/(float)lines,
+            0,
+            resolution.x/(float)lines,
+            resolution.y
+        });
+        }
+    }
+    return hitboxes;
+}
+
+void SwitchVerticalLines::Draw(Color color) const {
+    for (const auto hitbox: rectHitboxes) {
+        DrawRectangle(hitbox.x, hitbox.y, hitbox.width, hitbox.height, color);
+    }
 }
 
 void DrawRectHitbox(Rectangle hitbox, Color color, int thickness) {

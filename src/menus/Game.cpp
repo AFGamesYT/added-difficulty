@@ -15,20 +15,8 @@ namespace Game {
     static Texture2D badger;
 
     static std::vector<BaseEnemy*> enemies;
-
-    // enemy with multiple circle hitboxes
-    // also this is pointless
-
-    static FollowingEnemy testEnemy{std::vector{
-        CircleParams{1000, 1000, 2},
-        CircleParams{0, 0, 2},
-        CircleParams{1000, 0, 2}
-
-    }, badger};
-
-    // enemy with one circle
-
-    // static FollowingEnemy testEnemy{CircleParams{1000, 1000, 2}, badger};
+    static FollowingEnemy followingEnemy{CircleParams{1000, 1000, 2}, badger}; // following enemy test
+    static SwitchVerticalLines verticalLines{generateVerticalLinesHitboxes(7)}; // vertical line test
 
     static Rectangle playerRect;
 
@@ -41,7 +29,7 @@ namespace Game {
 
     static Font font;
 
-    void draw(Vector2 resolution) {
+    void draw() {
         static Vector2 pos{};
 
         if (pos.x != GetMousePosition().x) {
@@ -49,7 +37,7 @@ namespace Game {
         }
 
         pos = GetMousePosition();
-        testEnemy.target = pos;
+        followingEnemy.target = pos;
 
         if (firstLoad) {
             player_texture_left = LoadTexture("assets/player_sprites_left.png");
@@ -58,14 +46,16 @@ namespace Game {
 
             font = LoadFontEx("assets/SourGummy_font.ttf", (int)(0.07*resolution.y), nullptr, 0);
 
-            testEnemy.speed = 4.0f;
-            for (auto &circle: testEnemy.circleHitboxes) {
+            followingEnemy.speed = 2.0f;
+            for (auto &circle: followingEnemy.circleHitboxes) {
                 circle.radius = resolution.x*0.1/2;
             }
-            testEnemy.circleHitboxes[1].radius = resolution.x*0.1/2;
-            testEnemy.textureScale = resolution.x*0.20/500;
+            followingEnemy.textureScale = resolution.x*0.20/500;
 
-            enemies.push_back(&testEnemy);
+            followingEnemy.disabled = true;
+
+            enemies.push_back(&followingEnemy);
+            enemies.push_back(&verticalLines);
 
             playerSize = resolution.x * 0.185;
 
@@ -102,6 +92,7 @@ namespace Game {
         DrawRectHitbox(playerHitbox);
 
         for (const auto enemy: enemies) {
+            if (enemy->disabled) continue;
             if (enemy->isCollidingRec(playerHitbox)) {
                 gameOverTime = GetTime();
                 menu = AFTER_GAME;
@@ -111,7 +102,7 @@ namespace Game {
         }
     }
 
-    void afterGame(Menu &menu, Vector2 resolution) {
+    void afterGame(Menu &menu) {
             /* animation:
              * wait a bit
              * background fades to red

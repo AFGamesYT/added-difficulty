@@ -4,7 +4,7 @@
 #include "../definitions.hpp"
 
 namespace MainMenu {
-    void draw(Vector2 resolution);
+    void draw();
 
     void handle(Menu &menu);
 

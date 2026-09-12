@@ -5,18 +5,19 @@
 
 #include "definitions.hpp"
 
+// change this after adding settings
+// load from file
+Vector2 resolution = {1000, 1000};
+
 int main()
 {
-    constexpr int screenWidth = 1000;
-    constexpr int screenHeight = 1000;
-
     // sourGummy = LoadFont("assets/SourGummy_font.ttf");
 
     SetTraceLogLevel(LOG_ALL);
 
     Menu currentMenu = MAIN_MENU;
 
-    InitWindow(screenWidth, screenHeight, "Added Difficulty");
+    InitWindow(resolution.x, resolution.y, "Added Difficulty");
 
     SetTargetFPS(144);
     SetExitKey(KEY_NULL);
@@ -26,15 +27,15 @@ int main()
 
         switch(currentMenu) {
             case MAIN_MENU:
-                MainMenu::draw(Vector2{screenWidth, screenHeight});
+                MainMenu::draw();
                 MainMenu::handle(currentMenu);
                 break;
             case GAME:
-                Game::draw(Vector2{screenWidth, screenHeight});
+                Game::draw();
                 Game::handle(currentMenu);
                 break;
             case AFTER_GAME:
-                Game::afterGame(currentMenu, Vector2{screenWidth, screenHeight});
+                Game::afterGame(currentMenu);
         }
 
         EndDrawing();

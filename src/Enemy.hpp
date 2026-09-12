@@ -9,6 +9,8 @@ protected:
 public:
     double timeCreated;
 
+    bool disabled = false;
+
     std::vector<Rectangle> rectHitboxes{};
     std::vector<CircleParams> circleHitboxes{};
 
@@ -45,14 +47,17 @@ public:
 
 class SwitchVerticalLines: public BaseEnemy {
 public:
-    float switchSpeed = 1;
+    float switchTime = 3;
+    float nothingTime = 1.5; // time before switch time where there are no hitboxes
     double timeCreated;
-    Vector2 resolution{};
-
+    double timeSwitched{};
     explicit SwitchVerticalLines(const std::vector<Rectangle> &hitboxes);
 
     void Update(double timeScale) override;
+
+    void Draw(Color color) const;
 };
 
+std::vector<Rectangle> generateVerticalLinesHitboxes(int lines);
 void DrawRectHitbox(Rectangle rect, Color color = RED, int thickness = 1);
 void DrawCircleHitbox(CircleParams circle, Color color = RED, int thickness = 1);

@@ -19,3 +19,7 @@ struct CircleParams {
 
 constexpr Color GAME_BG = Color{12, 15, 33, 255};
 constexpr Color DEATH_BG = Color{117, 23, 23, 255};
+
+
+// settings
+extern Vector2 resolution;

@@ -5,7 +5,7 @@
 namespace MainMenu {
     static Font font;
     static bool firstLoad = true;
-    void draw(Vector2 resolution) {
+    void draw() {
         ClearBackground(RAYWHITE);
 
         if (firstLoad) {
