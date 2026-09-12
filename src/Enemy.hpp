@@ -35,7 +35,7 @@ public:
     Texture2D &texture;
 
     explicit FollowingEnemy(CircleParams params, Texture2D &texture);
-    explicit FollowingEnemy(std::vector<CircleParams> params, Texture2D &texture);
+    explicit FollowingEnemy(const std::vector<CircleParams>& params, Texture2D &texture);
 
     Vector2 GetNextPosition(bool set, CircleParams &params, double timeScale);
     void DrawNextPos(double timeScale);
@@ -46,7 +46,12 @@ public:
 class SwitchVerticalLines: public BaseEnemy {
 public:
     float switchSpeed = 1;
-    SwitchVerticalLines(Rectangle hitbox);
+    double timeCreated;
+    Vector2 resolution{};
+
+    explicit SwitchVerticalLines(const std::vector<Rectangle> &hitboxes);
+
+    void Update(double timeScale) override;
 };
 
 void DrawRectHitbox(Rectangle rect, Color color = RED, int thickness = 1);

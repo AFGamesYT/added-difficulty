@@ -17,6 +17,7 @@ namespace Game {
     static std::vector<BaseEnemy*> enemies;
 
     // enemy with multiple circle hitboxes
+    // also this is pointless
 
     static FollowingEnemy testEnemy{std::vector{
         CircleParams{1000, 1000, 2},
@@ -38,6 +39,8 @@ namespace Game {
     static Vector2 finalPlayerPos;
     static bool looking_left = false;
 
+    static Font font;
+
     void draw(Vector2 resolution) {
         static Vector2 pos{};
 
@@ -52,6 +55,8 @@ namespace Game {
             player_texture_left = LoadTexture("assets/player_sprites_left.png");
             player_texture_right = LoadTexture("assets/player_sprites_right.png");
             badger = LoadTexture("assets/badger.png");
+
+            font = LoadFontEx("assets/SourGummy_font.ttf", (int)(0.07*resolution.y), nullptr, 0);
 
             testEnemy.speed = 4.0f;
             for (auto &circle: testEnemy.circleHitboxes) {
@@ -106,7 +111,7 @@ namespace Game {
         }
     }
 
-    void afterGame(Menu &menu) {
+    void afterGame(Menu &menu, Vector2 resolution) {
             /* animation:
              * wait a bit
              * background fades to red
@@ -119,7 +124,7 @@ namespace Game {
         const double slow_progress = animHandler.quadraticOut(3);
         for (const auto enemy: enemies) {
             enemy->Update(slow_progress);
-            enemy->DrawHitbox();
+            enemy->DrawHitbox();  // draw hitbox for all enemies
         }
 
         DrawTexturePro(
@@ -144,7 +149,7 @@ namespace Game {
             DEATH_BG.b,
             (unsigned char)(255*bg_progress),
         });
-        DrawText("You died D:\nEnter to start again\nEsc to go to menu", 100, 100, 50, Color{
+        DrawTextEx(font, "You died D:\nEnter to start again\nEsc to go to menu", Vector2{100, 100}, 0.07*resolution.x, 0, Color{
             WHITE.r,
             WHITE.g,
             WHITE.b,
@@ -165,5 +170,6 @@ namespace Game {
         UnloadTexture(player_texture_left);
         UnloadTexture(player_texture_right);
         UnloadTexture(badger);
+        UnloadFont(font);
     }
 }

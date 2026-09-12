@@ -111,7 +111,7 @@ void FollowingEnemy::DrawNextPos(double timeScale) {
 
 FollowingEnemy::FollowingEnemy(CircleParams params, Texture2D &texture) : BaseEnemy(params), texture(texture) {}
 
-FollowingEnemy::FollowingEnemy(std::vector<CircleParams> params, Texture2D &texture) : BaseEnemy(params), texture(texture) {}
+FollowingEnemy::FollowingEnemy(const std::vector<CircleParams>& params, Texture2D &texture) : BaseEnemy(params), texture(texture) {}
 
 Vector2 FollowingEnemy::GetNextPosition(bool set, CircleParams &params, double timeScale) {
     const float dx = target.x - params.x;
@@ -141,6 +141,13 @@ Vector2 FollowingEnemy::GetNextPosition(bool set, CircleParams &params, double t
 
 void FollowingEnemy::Update(double timeScale) {
     DrawNextPos(timeScale);
+}
+
+
+SwitchVerticalLines::SwitchVerticalLines(const std::vector<Rectangle> &hitboxes) : BaseEnemy(hitboxes), timeCreated(GetTime()) {}
+
+void SwitchVerticalLines::Update(double timeScale) {
+
 }
 
 void DrawRectHitbox(Rectangle hitbox, Color color, int thickness) {

@@ -10,7 +10,7 @@ namespace Game {
 
     void handle(Menu &menu);
 
-    void afterGame(Menu &menu);
+    void afterGame(Menu &menu, Vector2 resolution);
 
     void end();
 }

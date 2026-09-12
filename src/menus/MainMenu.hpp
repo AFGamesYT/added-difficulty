@@ -7,4 +7,6 @@ namespace MainMenu {
     void draw(Vector2 resolution);
 
     void handle(Menu &menu);
+
+    void end();
 }

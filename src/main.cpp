@@ -10,6 +10,8 @@ int main()
     constexpr int screenWidth = 1000;
     constexpr int screenHeight = 1000;
 
+    // sourGummy = LoadFont("assets/SourGummy_font.ttf");
+
     SetTraceLogLevel(LOG_ALL);
 
     Menu currentMenu = MAIN_MENU;
@@ -32,13 +34,15 @@ int main()
                 Game::handle(currentMenu);
                 break;
             case AFTER_GAME:
-                Game::afterGame(currentMenu);
+                Game::afterGame(currentMenu, Vector2{screenWidth, screenHeight});
         }
 
         EndDrawing();
     }
 
     Game::end();
+    MainMenu::end();
+
     CloseWindow();
 
     return 0;
