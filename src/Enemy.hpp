@@ -58,6 +58,20 @@ public:
     void Draw(Color color) const;
 };
 
+class SwitchHorizontalLines: public BaseEnemy {
+public:
+    float switchTime = 3;
+    float nothingTime = 1.5; // time before switch time where there are no hitboxes
+    double timeCreated;
+    double timeSwitched{};
+    explicit SwitchHorizontalLines(const std::vector<Rectangle> &hitboxes);
+
+    void Update(double timeScale) override;
+
+    void Draw(Color color) const;
+};
+
 std::vector<Rectangle> generateVerticalLinesHitboxes(int lines);
+std::vector<Rectangle> generateHorizontalLinesHitboxes(int lines);
 void DrawRectHitbox(Rectangle rect, Color color = RED, int thickness = 1);
 void DrawCircleHitbox(CircleParams circle, Color color = RED, int thickness = 1);

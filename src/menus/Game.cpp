@@ -17,6 +17,7 @@ namespace Game {
     static std::vector<BaseEnemy*> enemies;
     static FollowingEnemy followingEnemy{CircleParams{1000, 1000, 2}, badger}; // following enemy test
     static SwitchVerticalLines verticalLines{generateVerticalLinesHitboxes(7)}; // vertical line test
+    static SwitchHorizontalLines horizontalLines{generateHorizontalLinesHitboxes(9)}; // vertical line test
 
     static Rectangle playerRect;
 
@@ -52,10 +53,11 @@ namespace Game {
             }
             followingEnemy.textureScale = resolution.x*0.20/500;
 
-            followingEnemy.disabled = true;
+            // followingEnemy.disabled = true;
 
             enemies.push_back(&followingEnemy);
             enemies.push_back(&verticalLines);
+            // enemies.push_back(&horizontalLines);
 
             playerSize = resolution.x * 0.185;
 

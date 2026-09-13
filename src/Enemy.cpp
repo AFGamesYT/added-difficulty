@@ -179,6 +179,47 @@ void SwitchVerticalLines::Update(double timeScale) {
     Draw(disabled ? Color{255, 0, 0, 70} : RED);
 }
 
+SwitchHorizontalLines::SwitchHorizontalLines(const std::vector<Rectangle> &hitboxes) : BaseEnemy(hitboxes), timeCreated(GetTime()) {
+    disabled = true;
+}
+
+void SwitchHorizontalLines::Update(double timeScale) {
+    if (GetTime()-timeSwitched > switchTime*(1/timeScale)) {
+        disabled = false;
+        timeSwitched = GetTime();
+    } else if (switchTime*(1/timeScale)-(GetTime()-timeSwitched) < nothingTime*(1/timeScale) && !disabled) {
+        disabled = true;
+
+        std::vector<Rectangle> newHitboxes;
+        for (const auto hitbox: rectHitboxes) {
+            if (rectHitboxes[0].y == 0) { // basically if this has been switched or not
+                newHitboxes.push_back(Rectangle{
+                    0,
+                    hitbox.y+hitbox.height+1,
+                    hitbox.width,
+                    hitbox.height
+                });
+            } else {
+                newHitboxes.push_back(Rectangle{
+                    0,
+                    hitbox.y-hitbox.height-1,
+                    hitbox.width,
+                    hitbox.height
+                });
+            }
+        }
+        rectHitboxes = newHitboxes;
+    }
+
+    Draw(disabled ? Color{255, 0, 0, 70} : RED);
+}
+
+void SwitchVerticalLines::Draw(Color color) const {
+    for (const auto hitbox: rectHitboxes) {
+        DrawRectangle(hitbox.x, hitbox.y, hitbox.width, hitbox.height, color);
+    }
+}
+
 std::vector<Rectangle> generateVerticalLinesHitboxes(int lines) {
     std::vector<Rectangle> hitboxes;
     for (int i = 0; i<lines; i++) {
@@ -194,7 +235,22 @@ std::vector<Rectangle> generateVerticalLinesHitboxes(int lines) {
     return hitboxes;
 }
 
-void SwitchVerticalLines::Draw(Color color) const {
+std::vector<Rectangle> generateHorizontalLinesHitboxes(int lines) {
+    std::vector<Rectangle> hitboxes;
+    for (int i = 0; i<lines; i++) {
+        if (i % 2 == 0) {
+            hitboxes.push_back({
+            0,
+            (float)i*resolution.y/(float)lines,
+            resolution.x,
+            resolution.y/(float)lines
+        });
+        }
+    }
+    return hitboxes;
+}
+
+void SwitchHorizontalLines::Draw(Color color) const {
     for (const auto hitbox: rectHitboxes) {
         DrawRectangle(hitbox.x, hitbox.y, hitbox.width, hitbox.height, color);
     }
